@@ -2,24 +2,24 @@
     /*初始化*/
     "initialize": {
         /*宽度*/
-        "width": 1300,
+        "width": 1000,
         /*高度*/
-        "height": 900,
+        "height": 600,
         /*是否全屏*/
         "fullscreen": false,
         /*启动时是否隐藏主界面*/
-        "hide": false,
+        "hide": true,
         "tabs": {
             /*初始化加载的选项卡*/
             "loads": [
-                "FileManager",
                 "JsonParser",
-                "RandomGenerator",
-                "ClipboardHistory",
-                "QrCodeGenerator",
-                "CharsetConverter",
-                "NetworkTool",
-                "NaryConverter"
+                //"FileManager",
+                //"ClipboardHistory",
+                //"CharsetConverter"
+                //"RandomGenerator",
+                // "QrCodeGenerator",
+                //  "NetworkTool",
+                // "NaryConverter"
             ],
             /*支持初始化加载的选项卡，注意：这里只是展示，此配置修改是无效的*/
             "supports": [
@@ -70,9 +70,9 @@
     /*windows虚拟桌面触发角：LEFT_TOP, LEFT_BOTTOM, RIGHT_TOP, RIGHT_BOTTOM*/
     "winVirtualDesktopHotCorner": "RIGHT_TOP",
     /*是否关闭鼠标键盘监听器*/
-    "disableKeyboardMouseListener": true,
+    "disableKeyboardMouseListener": false,
     /*是否关闭暗黑模式*/
-    "disableDarkMode": false,
+    "disableDarkMode": true,
     /*自动移除未加载的插件*/
     "autoRemoveUnloadedPlugin": true,
     /*数据库连接配置*/
