@@ -1,9 +1,10 @@
 package org.code4everything.wetool.controller.parser;
 
-import cn.hutool.core.thread.ThreadUtil;
 import cn.hutool.core.util.StrUtil;
 import com.alibaba.fastjson.JSON;
+import com.alibaba.fastjson.JSONObject;
 import com.alibaba.fastjson.JSONPath;
+import com.alibaba.fastjson.serializer.SerializerFeature;
 import javafx.application.Platform;
 import javafx.fxml.FXML;
 import javafx.scene.control.TextArea;
@@ -50,7 +51,15 @@ public class JsonParserController implements BaseViewController {
         String json = jsonContent.getText();
         String path = jsonPath.getText();
         if (StrUtil.isEmpty(path)) {
-            parsedJsonContent.setText(json);
+            try {
+                JSONObject jsonObject = JSON.parseObject(json);
+                // 使用 SerializerFeature.PrettyFormat 进行美化输出
+                String prettyJsonString = JSON.toJSONString(jsonObject, SerializerFeature.PrettyFormat);
+                Platform.runLater(() -> parsedJsonContent.setText(prettyJsonString));
+            } catch (Exception e) {
+                log.error("JSON 字符串转换异常！格式异常！", e);
+                FxDialogs.showError(TipConsts.JSON_PARSE_ERROR);
+            }
             return;
         }
         WeUtils.execute(() -> {
