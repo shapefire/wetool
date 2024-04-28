@@ -27,7 +27,7 @@
             </Menu>
             <Menu fx:id="toolMenu" mnemonicParsing="false" text="工具">
                 <MenuItem id="FileManager" mnemonicParsing="false" text="文件批处理"/>
-                <MenuItem id="ClipboardHistory" mnemonicParsing="false" text="剪贴板历史"/>
+                <!--<MenuItem id="ClipboardHistory" mnemonicParsing="false" text="剪贴板历史"/>-->
                 <MenuItem id="NetworkTool" mnemonicParsing="false" text="网络工具"/>
                 <MenuItem id="JsonParser" mnemonicParsing="false" text="JSON解析"/>
                 <SeparatorMenuItem/>

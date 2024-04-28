@@ -5,14 +5,9 @@ import cn.hutool.cache.CacheUtil;
 import cn.hutool.core.collection.CollUtil;
 import cn.hutool.core.date.DateUtil;
 import cn.hutool.core.io.FileUtil;
-import cn.hutool.core.io.resource.ResourceUtil;
 import cn.hutool.core.lang.Pair;
 import cn.hutool.core.swing.clipboard.ClipboardUtil;
-import cn.hutool.core.util.ArrayUtil;
-import cn.hutool.core.util.NumberUtil;
-import cn.hutool.core.util.ObjectUtil;
-import cn.hutool.core.util.RuntimeUtil;
-import cn.hutool.core.util.StrUtil;
+import cn.hutool.core.util.*;
 import cn.hutool.extra.pinyin.PinyinUtil;
 import cn.hutool.system.SystemUtil;
 import com.google.common.base.Preconditions;
@@ -21,18 +16,7 @@ import javafx.event.ActionEvent;
 import javafx.event.EventHandler;
 import javafx.fxml.FXML;
 import javafx.scene.Node;
-import javafx.scene.control.ComboBox;
-import javafx.scene.control.Control;
-import javafx.scene.control.Menu;
-import javafx.scene.control.MenuItem;
-import javafx.scene.control.ScrollPane;
-import javafx.scene.control.SeparatorMenuItem;
-import javafx.scene.control.SplitPane;
-import javafx.scene.control.Tab;
-import javafx.scene.control.TabPane;
-import javafx.scene.control.TextArea;
-import javafx.scene.control.TextField;
-import javafx.scene.control.TitledPane;
+import javafx.scene.control.*;
 import javafx.scene.input.KeyCode;
 import javafx.scene.input.KeyEvent;
 import javafx.scene.layout.HBox;
@@ -59,7 +43,6 @@ import org.code4everything.wetool.plugin.support.config.WeStatus;
 import org.code4everything.wetool.plugin.support.constant.AppConsts;
 import org.code4everything.wetool.plugin.support.event.EventCenter;
 import org.code4everything.wetool.plugin.support.event.handler.BaseMouseCornerEventHandler;
-import org.code4everything.wetool.plugin.support.event.handler.BaseNoMessageEventHandler;
 import org.code4everything.wetool.plugin.support.event.message.ClipboardChangedEventMessage;
 import org.code4everything.wetool.plugin.support.event.message.MouseCornerEventMessage;
 import org.code4everything.wetool.plugin.support.event.message.QuickStartEventMessage;
@@ -76,14 +59,7 @@ import org.code4everything.wetool.util.FinalUtils;
 import org.jnativehook.keyboard.NativeKeyEvent;
 
 import java.io.File;
-import java.util.ArrayList;
-import java.util.Date;
-import java.util.HashMap;
-import java.util.LinkedHashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.Objects;
-import java.util.Set;
+import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.regex.Pattern;
 import java.util.stream.Collectors;
@@ -114,7 +90,7 @@ public class MainController {
         registerAction("FileManager", TitleConsts.FILE_MANAGER, ViewConsts.FILE_MANAGER);
         registerAction("JsonParser", TitleConsts.JSON_PARSER, ViewConsts.JSON_PARSER);
         registerAction("RandomGenerator", TitleConsts.RANDOM_GENERATOR, ViewConsts.RANDOM_GENERATOR);
-        registerAction("ClipboardHistory", TitleConsts.CLIPBOARD_HISTORY, ViewConsts.CLIPBOARD_HISTORY);
+        //  registerAction("ClipboardHistory", TitleConsts.CLIPBOARD_HISTORY, ViewConsts.CLIPBOARD_HISTORY);
         registerAction("QrCodeGenerator", TitleConsts.QR_CODE_GENERATOR, ViewConsts.QR_CODE_GENERATOR);
         registerAction("CharsetConverter", TitleConsts.CHARSET_CONVERTER, ViewConsts.CHARSET_CONVERTER);
         registerAction("NetworkTool", TitleConsts.NETWORK_TOOL, ViewConsts.NETWORK_TOOL);
@@ -206,13 +182,13 @@ public class MainController {
         // 加载网页工具
         addWebTool();
         // 监听剪贴板
-        config.appendClipboardHistory(new Date(), ClipboardUtil.getStr());
+        /*config.appendClipboardHistory(new Date(), ClipboardUtil.getStr());
         EventCenter.onSecondTimer(new BaseNoMessageEventHandler() {
             @Override
             public void handleEvent0(String s, Date date) {
                 watchClipboard(date);
             }
-        });
+        });*/
 
         // 监听鼠标位置
         log.info("add mouse corner trigger");
@@ -457,7 +433,7 @@ public class MainController {
         FxUtils.registerShortcuts(shortcuts, this::pluginPane);
 
         // ctrl+1...9 打开指定选项卡
-        shortcuts = List.of(NativeKeyEvent.VC_CONTROL, NativeKeyEvent.VC_9);
+        shortcuts = List.of(NativeKeyEvent.VC_SHIFT, NativeKeyEvent.VC_9);
         FxUtils.registerShortcuts(shortcuts, () -> tabPane.getSelectionModel().selectLast());
         for (int i = 1; i < 9; i++) {
             int idx = i - 1;
@@ -483,13 +459,14 @@ public class MainController {
 
     private void registerGlobalShortcuts() {
         // 全局快捷键
-        List<Integer> shortcuts = List.of(NativeKeyEvent.VC_CONTROL, NativeKeyEvent.VC_ALT, NativeKeyEvent.VC_SHIFT, NativeKeyEvent.VC_ENTER);
+        // List<Integer> shortcuts = List.of(NativeKeyEvent.VC_CONTROL, NativeKeyEvent.VC_ALT, NativeKeyEvent.VC_SHIFT, NativeKeyEvent.VC_ENTER);
+        List<Integer> shortcuts = List.of(NativeKeyEvent.VC_CONTROL, NativeKeyEvent.VC_SHIFT, NativeKeyEvent.VC_X);
         FxUtils.registerGlobalShortcuts(shortcuts, () -> {
             if (FxUtils.getStage().isShowing()) {
                 FxUtils.hideStage();
             } else {
                 Platform.runLater(() -> {
-                    FxUtils.getStage().show();
+                    FxUtils.showStage();
                     toolSearchBox.requestFocus();
                 });
             }
@@ -643,7 +620,8 @@ public class MainController {
     }
 
     public void about() {
-        String gitInfo = StrUtil.trim(ResourceUtil.readUtf8Str("gitinfo"));
+        FxDialogs.showInformation("关于WeTools信息", "WeTools!");
+       /* String gitInfo = StrUtil.trim(ResourceUtil.readUtf8Str("gitinfo"));
         String aboutApp = TipConsts.ABOUT_APP;
         if (StrUtil.isNotEmpty(gitInfo) && !StrUtil.startWith(gitInfo, "master")) {
             List<String> infos = StrUtil.splitTrim(gitInfo, ":", 4);
@@ -657,7 +635,7 @@ public class MainController {
             }
             aboutApp += "\r\n";
         }
-        FxDialogs.showInformation(TitleConsts.ABOUT_APP, aboutApp);
+        FxDialogs.showInformation(TitleConsts.ABOUT_APP, aboutApp);*/
     }
 
     public void closeAllTab() {
