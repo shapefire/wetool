@@ -36,7 +36,6 @@ import org.code4everything.boot.base.ObjectUtils;
 import org.code4everything.boot.base.constant.IntegerConsts;
 import org.code4everything.boot.config.BootConfig;
 import org.code4everything.wetool.adapter.NativeKeyEventAdapter;
-import org.code4everything.wetool.constant.FileConsts;
 import org.code4everything.wetool.constant.TipConsts;
 import org.code4everything.wetool.constant.TitleConsts;
 import org.code4everything.wetool.constant.ViewConsts;
@@ -117,6 +116,7 @@ public class WeApplication extends Application {
         log.info("starting wetool on os: {}", SystemUtil.getOsInfo().getName());
         log.info("default charset: {}", Charset.defaultCharset().name());
         BeanFactory.register(new WeStatus().setState(WeStatus.State.STARTING));
+        //添加关闭程序钩子
         addShutdownHook();
         boolean debug = BootConfig.isDebug();
         if (ArrayUtil.isNotEmpty(args)) {
@@ -138,8 +138,9 @@ public class WeApplication extends Application {
         if (BootConfig.isDebug()) {
             log.info("enable debug mode");
         }
-
+        //检查是否已启动
         checkAlreadyRunning();
+        //初始化应用
         initApp();
         launch(args);
     }
@@ -208,6 +209,7 @@ public class WeApplication extends Application {
 
     public static void initApp() {
         CronUtil.setMatchSecond(true);
+        //解析文件路径
         String path = WeUtils.parsePathByOs("we-plugin-config.json");
         BeanFactory.register(JSON.parseObject(Objects.isNull(path) ? "{}" : FileUtil.readUtf8String(path), WePluginConfig.class));
 
@@ -227,10 +229,12 @@ public class WeApplication extends Application {
         EventCenter.registerEvent(EventCenter.EVENT_MOUSE_RELEASED, EventMode.MULTI_SUB);
         EventCenter.registerEvent(EventCenter.EVENT_MOUSE_PRESSED, EventMode.MULTI_SUB);
         EventCenter.registerEvent(EventCenter.EVENT_ALL_PLUGIN_LOADED, EventMode.MULTI_SUB);
+        //暂时注释掉 100ms 心跳发送事件
+        //EXECUTOR.scheduleWithFixedDelay(() -> EventCenter.publishEvent(EventCenter.EVENT_100_MS_TIMER, DateUtil.date()), 0, 100, TimeUnit.MILLISECONDS);
 
-        EXECUTOR.scheduleWithFixedDelay(() -> EventCenter.publishEvent(EventCenter.EVENT_100_MS_TIMER, DateUtil.date()), 0, 100, TimeUnit.MILLISECONDS);
-
+        // 初始化键盘鼠标监听器
         initKeyboardMouseListener();
+
         connectDb();
         exportHttpService();
     }
@@ -514,13 +518,13 @@ public class WeApplication extends Application {
         // 添加托盘邮件菜单
         PopupMenu popupMenu = new PopupMenu();
         // 快捷打开
-        Set<WeStart> starts = WeUtils.getConfig().getQuickStarts();
+     /*   Set<WeStart> starts = WeUtils.getConfig().getQuickStarts();
         if (CollUtil.isNotEmpty(starts)) {
             Menu menu = new Menu(TitleConsts.QUICK_START);
             setQuickStartMenu(menu, starts);
             popupMenu.add(menu);
             popupMenu.addSeparator();
-        }
+        }*/
         // 插件菜单
         popupMenu.add(PLUGIN_MENU);
         popupMenu.addSeparator();
@@ -552,13 +556,13 @@ public class WeApplication extends Application {
 
     private void addQuickOpenMenu(Menu menu) {
         menu.add(FxUtils.createTrayMenuItem("配置文件", e -> FinalUtils.openConfig()));
-        menu.add(FxUtils.createTrayMenuItem("日志文件", e -> FxUtils.openFile(FileConsts.LOG)));
+        // menu.add(FxUtils.createTrayMenuItem("日志文件", e -> FxUtils.openFile(FileConsts.LOG)));
         menu.addSeparator();
         menu.add(FxUtils.createTrayMenuItem("工作目录", e -> FxUtils.openFile(FileUtils.currentWorkDir())));
         menu.add(FxUtils.createTrayMenuItem("插件目录", e -> FinalUtils.openPluginFolder()));
-        menu.add(FxUtils.createTrayMenuItem("日志目录", e -> FxUtils.openFile(FileConsts.LOG_FOLDER)));
-        menu.addSeparator();
-        menu.add(FxUtils.createTrayMenuItem("插件仓库", e -> FxUtils.openLink(TipConsts.REPO_LINK)));
+        //menu.add(FxUtils.createTrayMenuItem("日志目录", e -> FxUtils.openFile(FileConsts.LOG_FOLDER)));
+        // menu.addSeparator();
+        // menu.add(FxUtils.createTrayMenuItem("插件仓库", e -> FxUtils.openLink(TipConsts.REPO_LINK)));
     }
 
     private static class TrayMouseListener implements MouseListener {
