@@ -1,0 +1,9 @@
+1.IDEA 启动时 添加 VM 参数： -Djavafx.platform=win -Dfile.encoding=gbk
+
+2. 配置启动时不展示 主界面  --》配置文件 we-config：  initialize.hide 参数
+
+3. 配置全局快捷键 开启  --》we-config： disableKeyboardMouseListener
+
+4.关闭 jnative 日志  --》WeApplication 类中 更改代码 禁用 GlobalScreen类的日志
+
+5. 更改 全局展示主界面快捷键(主界面的快捷键)   --》 MainController    全局展示主界面快捷键替换为  CTRL + SHIFT+ X
