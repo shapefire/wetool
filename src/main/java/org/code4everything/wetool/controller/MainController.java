@@ -12,6 +12,7 @@ import cn.hutool.extra.pinyin.PinyinUtil;
 import cn.hutool.system.SystemUtil;
 import com.google.common.base.Preconditions;
 import javafx.application.Platform;
+import javafx.concurrent.Worker;
 import javafx.event.ActionEvent;
 import javafx.event.EventHandler;
 import javafx.fxml.FXML;
@@ -284,10 +285,16 @@ public class MainController {
     }
 
     private WebView newWebView() {
-        WebView view = new WebView();
-        WebEngine engine = view.getEngine();
-        engine.setJavaScriptEnabled(true);
-        engine.setUserAgent("Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/90.0.4430.93 Safari/537.36");
+        WebView view;
+        try {
+            view = new WebView();
+            WebEngine engine = view.getEngine();
+            engine.setJavaScriptEnabled(true);
+            engine.setUserAgent("Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/90.0.4430.93 Safari/537.36");
+        } catch (Exception e) {
+            log.error("webView initial failed!", e);
+            return new WebView();
+        }
         return view;
     }
 
@@ -334,11 +341,11 @@ public class MainController {
         WebView browser = WEB_TOOL_BROWSER_MAP.get(name);
         if (Objects.isNull(browser)) {
             browser = newWebView();
+
             WEB_TOOL_BROWSER_MAP.put(name, browser);
         }
 
         WebEngine webEngine = browser.getEngine();
-        webEngine.getHistory().getEntries().clear();
         if (url.startsWith("file:")) {
             webEngine.loadContent(FileUtil.readUtf8String(url.substring(5)));
         } else if (url.startsWith("http:") || url.startsWith("https:")) {
@@ -346,6 +353,18 @@ public class MainController {
         } else {
             throw ToDialogException.ofError("格式配置错误，格式请参考：file:c:\\Users\\tool.html, file:/root/tool.html, http://localhost:8080/tool.html");
         }
+        webEngine.getLoadWorker().stateProperty().addListener((obs, oldState, newState) -> {
+            if (newState == Worker.State.SUCCEEDED) {
+               log.info("网页加载成功.");
+            } else if (newState == Worker.State.FAILED) {
+                Throwable exception = webEngine.getLoadWorker().getException();
+                if (exception != null) {
+                    log.error("网页加载失败原因：", exception);
+                }else {
+                    log.error("网页加载失败，未知原因！");
+                }
+            }
+        });
 
         return browser;
     }

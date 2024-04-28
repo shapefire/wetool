@@ -7,3 +7,5 @@
 4.关闭 jnative 日志  --》WeApplication 类中 更改代码 禁用 GlobalScreen类的日志
 
 5. 更改 全局展示主界面快捷键(主界面的快捷键)   --》 MainController    全局展示主界面快捷键替换为  CTRL + SHIFT+ X
+
+6.网页工具 打不开页面问题 --》 看下是否有配置代理， 如有配置，则取消试试 或者 此网页内容需要代理才能打开
