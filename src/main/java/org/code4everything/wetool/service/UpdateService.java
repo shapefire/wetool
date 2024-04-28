@@ -8,26 +8,17 @@ import cn.hutool.core.util.ZipUtil;
 import cn.hutool.http.HttpUtil;
 import cn.hutool.system.OsInfo;
 import cn.hutool.system.SystemUtil;
-import javafx.geometry.Insets;
-import javafx.scene.control.Label;
-import javafx.scene.layout.Priority;
-import javafx.scene.layout.VBox;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 import lombok.experimental.Accessors;
 import lombok.extern.slf4j.Slf4j;
 import org.code4everything.boot.base.FileUtils;
-import org.code4everything.wetool.plugin.support.constant.AppConsts;
-import org.code4everything.wetool.plugin.support.exception.ToDialogException;
-import org.code4everything.wetool.plugin.support.util.DialogWinnable;
 import org.code4everything.wetool.plugin.support.util.FxDialogs;
 import org.code4everything.wetool.plugin.support.util.FxUtils;
 import org.code4everything.wetool.plugin.support.util.WeUtils;
 
 import java.io.File;
 import java.util.List;
-import java.util.Objects;
-import java.util.StringJoiner;
 import java.util.stream.Collectors;
 
 /**
@@ -39,7 +30,8 @@ public class UpdateService {
 
     public void checkUpdate() {
         log.info("get version info to check update");
-        String history = HttpUtil.get("https://gitee.com/code4everything/wetool/raw/master/history.md");
+        FxDialogs.showError("版本更新不可用");
+      /*  String history = HttpUtil.get("https://gitee.com/code4everything/wetool/raw/master/history.md");
         if (StrUtil.isEmpty(history)) {
             throw ToDialogException.ofError("网络异常");
         }
@@ -73,7 +65,7 @@ public class UpdateService {
                     update(versionInfo.getDownloadUrl());
                 }
             }
-        });
+        });*/
     }
 
     public void update(String downloadUrl) {
